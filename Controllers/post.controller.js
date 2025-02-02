@@ -53,8 +53,41 @@ function allPost(req,res){
     })
 }
 
+function editPost(req, res) {
+    const id = req.params.id;
+  
+    const post = {
+      title: req.body.title,
+      content: req.body.content,
+      imageUrl: req.body.image_url,
+      categoryId: req.body.category_id,
+    };
+  
+    models.Post.update(post, { where: { id: id } })
+      .then(([rowsUpdated]) => {
+        if (rowsUpdated === 0) {
+          return res.status(404).json({ message: "Post not found" });
+        }
+        return models.Post.findByPk(id);
+      })
+      .then((updatedPost) => {
+        res.status(202).json({
+          message: "Post updated successfully",
+          post: updatedPost,
+        });
+      })
+      .catch((error) => {
+        res.status(400).json({
+          message: "Something went wrong",
+          error: error.message,
+        });
+      });
+  }
+  
+
 module.exports = {
     newPost : newPost,
     singlePost : singlePost,
-    allPost : allPost
+    allPost : allPost,
+    editPost : editPost
 }
